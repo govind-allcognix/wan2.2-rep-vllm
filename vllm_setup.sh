@@ -48,8 +48,8 @@ ok "vLLM-Omni installed"
 MODELS="${MODELS:-t2v-A14B}"
 
 declare -A MODEL_REPO=(
-    ["t2v-A14B"]="Wan-AI/Wan2.2-T2V-A14B"
-    ["ti2v-5B"]="Wan-AI/Wan2.2-TI2V-5B"
+    ["t2v-A14B"]="Wan-AI/Wan2.2-T2V-A14B-Diffusers"
+    ["ti2v-5B"]="Wan-AI/Wan2.2-TI2V-5B-Diffusers"
 )
 
 if [ "${SKIP_DOWNLOAD}" = "1" ]; then
@@ -57,20 +57,22 @@ if [ "${SKIP_DOWNLOAD}" = "1" ]; then
 else
     step "4/5  Downloading model weights..."
     mkdir -p /workspace/models
-    pip install "huggingface_hub[cli]" hf_transfer -q
+    pip install huggingface_hub hf_transfer -q
 
     for MODEL_KEY in ${MODELS}; do
         REPO="${MODEL_REPO[$MODEL_KEY]}"
         DEST="/workspace/models/Wan2.2-${MODEL_KEY}"
 
-        if [ -f "${DEST}/config.json" ]; then
+        if [ -f "${DEST}/model_index.json" ]; then
             ok "${MODEL_KEY} already downloaded at ${DEST}"
         else
-            echo "  Downloading ${MODEL_KEY} → ${DEST}"
-            HF_HUB_ENABLE_HF_TRANSFER=1 huggingface-cli download \
-                "${REPO}" \
-                --local-dir "${DEST}" \
-                --local-dir-use-symlinks False
+            echo "  Downloading ${MODEL_KEY} (Diffusers format) → ${DEST}"
+            python3 -c "
+import os
+os.environ['HF_HUB_ENABLE_HF_TRANSFER'] = '1'
+from huggingface_hub import snapshot_download
+snapshot_download(repo_id='${REPO}', local_dir='${DEST}', local_dir_use_symlinks=False)
+"
             ok "${MODEL_KEY} downloaded to ${DEST}"
         fi
     done
