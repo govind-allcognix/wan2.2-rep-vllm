@@ -1,4 +1,3 @@
-python <<'EOF'
 from vllm_omni.entrypoints.omni import Omni
 import torch
 
@@ -42,4 +41,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-EOF
