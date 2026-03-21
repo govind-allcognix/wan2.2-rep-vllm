@@ -1,5 +1,5 @@
 import argparse
-from vllm import LLM, SamplingParams
+from vllm_omni.entrypoints.omni import Omni
 import torch
 
 def main():
@@ -13,31 +13,22 @@ def main():
 
     print(f"Loading vLLM-Omni Diffusion Engine across {args.tensor_parallel_size} GPU(s)...")
     
-    # Initialize the vLLM Engine
-    llm = LLM(
+    # Initialize the specialized vLLM Omni Engine specifically built for Diffusion
+    engine = Omni(
         model=args.model,
         tensor_parallel_size=args.tensor_parallel_size,
-        enforce_eager=True,           # Often required for beta multimodal architectures
+        enforce_eager=True,           
         trust_remote_code=True,
-        gpu_memory_utilization=0.95   # Maximize VRAM usage
-    )
-    
-    # Note: Omni's extended SamplingParams for video might take specific kwargs for W/H/Frames
-    # Refer to vllm-omni docs for exact kwarg mapping. This is a generic blueprint.
-    sampling_params = SamplingParams(
-        temperature=0.0,
-        # Currently passing extras as mock implementation; adjust per omni API specs
+        gpu_memory_utilization=0.95   
     )
     
     print(f"\n[+] Generating video for prompt: '{args.prompt}'")
     print(f"[+] Settings: {args.resolution} @ {args.frames} frames")
     
-    outputs = llm.generate([args.prompt], sampling_params)
+    outputs = engine.generate(args.prompt)
     
     print("\n[+] Generation complete!")
-    for output in outputs:
-        # In vllm-omni, outputs hold the multimodal output tensor or saved path
-        print("Result:", output)
+    print("Result:", outputs)
 
 if __name__ == "__main__":
     main()

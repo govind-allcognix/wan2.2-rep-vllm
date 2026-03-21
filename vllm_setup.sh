@@ -41,7 +41,10 @@ ok "System packages installed"
 # ── STEP 3: Install vLLM-Omni ─────────────────────────────────────
 step "3/5  Installing vLLM-Omni Engine..."
 pip install --upgrade pip setuptools wheel -q
-pip install vllm-omni -U -q
+
+# Installing torchvision and torchaudio alongside it forces pip's resolver 
+# to upgrade them to match the new PyTorch version vLLM installs, hiding the red ERROR block.
+pip install vllm-omni torchvision torchaudio notebook -U
 ok "vLLM-Omni installed"
 
 # ── STEP 4: Download model weights ────────────────────────────────
