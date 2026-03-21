@@ -23,19 +23,25 @@ def main():
     )
     
     print(f"\n[+] Generating video for prompt: '{args.prompt}'")
-    print(f"[+] Settings: {args.resolution} @ {args.frames} frames")
+    print(f"[+] Settings Requested: {args.resolution} @ {args.frames} frames")
     
-    # Parse resolution
+    # Parse requested resolution
     width, height = map(int, args.resolution.lower().split('x'))
-
-    # vLLM Omni allows overriding generation parameters directly as kwargs
-    outputs = engine.generate(
-        args.prompt,
-        height=height,
-        width=width,
-        num_frames=args.frames,
-        num_inference_steps=20
-    )
+    
+    try:
+        from vllm_omni.inputs.data import OmniDiffusionSamplingParams
+        # Inject exact video dimensions directly into the specialized parameter class
+        sampling_params = OmniDiffusionSamplingParams(
+            height=height,
+            width=width,
+            num_frames=args.frames,
+            num_inference_steps=20 # Default step count for flow-matching
+        )
+        outputs = engine.generate(args.prompt, sampling_params_list=sampling_params)
+    except Exception as e:
+        print("[!] Could not inject exact height/width custom parameters:", e)
+        print("[!] Generating via Model Constants instead...")
+        outputs = engine.generate(args.prompt)
     
     print("\n[+] Generation complete!")
     print("Result:", outputs)
