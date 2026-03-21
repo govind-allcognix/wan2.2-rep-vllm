@@ -16,7 +16,9 @@ def main():
         tensor_parallel_size=tensor_parallel_size,
         enforce_eager=True,           
         trust_remote_code=True,
-        gpu_memory_utilization=0.95   
+        gpu_memory_utilization=0.70,
+        vae_use_slicing=True,
+        vae_use_tiling=True
     )
     
     print(f"\n[+] Generating video for prompt: '{prompt}'")

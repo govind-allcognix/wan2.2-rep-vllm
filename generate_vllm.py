@@ -14,12 +14,17 @@ def main():
     print(f"Loading vLLM-Omni Diffusion Engine across {args.tensor_parallel_size} GPU(s)...")
     
     # Initialize the specialized vLLM Omni Engine specifically built for Diffusion
+    # We must restrict vLLM's intrinsic cache to ~65-70% of the GPU so 
+    # the 3D VAE decoder has enough raw VRAM left over at the end to 
+    # decompress the 1280x720x81 latent tensors into raw pixels!
     engine = Omni(
         model=args.model,
         tensor_parallel_size=args.tensor_parallel_size,
         enforce_eager=True,           
         trust_remote_code=True,
-        gpu_memory_utilization=0.95   
+        gpu_memory_utilization=0.65,
+        vae_use_slicing=True,
+        vae_use_tiling=True
     )
     
     print(f"\n[+] Generating video for prompt: '{args.prompt}'")
