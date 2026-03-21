@@ -31,7 +31,8 @@ def main():
             height=height,
             width=width,
             num_frames=frames,
-            num_inference_steps=20
+            num_inference_steps=20,
+            guidance_scale=5.0
         )
         
         # We MUST dynamically instruct the Multimodal vLLM Engine that we are building 

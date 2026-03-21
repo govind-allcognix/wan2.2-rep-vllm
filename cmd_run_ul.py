@@ -7,7 +7,7 @@ def main():
     model = "Wan-AI/Wan2.2-T2V-A14B-Diffusers"
     prompt = "A cinematic video of a cyberpunk city at night with neon lights reflecting in puddles"
     tensor_parallel_size = 2
-    frames = 81
+    frames = 17
 
     print(f"Loading vLLM-Omni Diffusion Engine across {tensor_parallel_size} GPU(s)...")
     
@@ -31,7 +31,8 @@ def main():
             height=height,
             width=width,
             num_frames=frames,
-            num_inference_steps=20
+            num_inference_steps=20,
+            guidance_scale=5.0
         )
         
         # We MUST dynamically instruct the Multimodal vLLM Engine that we are building 
