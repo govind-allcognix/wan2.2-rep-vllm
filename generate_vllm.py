@@ -25,7 +25,17 @@ def main():
     print(f"\n[+] Generating video for prompt: '{args.prompt}'")
     print(f"[+] Settings: {args.resolution} @ {args.frames} frames")
     
-    outputs = engine.generate(args.prompt)
+    # Parse resolution
+    width, height = map(int, args.resolution.lower().split('x'))
+
+    # vLLM Omni allows overriding generation parameters directly as kwargs
+    outputs = engine.generate(
+        args.prompt,
+        height=height,
+        width=width,
+        num_frames=args.frames,
+        num_inference_steps=20
+    )
     
     print("\n[+] Generation complete!")
     print("Result:", outputs)

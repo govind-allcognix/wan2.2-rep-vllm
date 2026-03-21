@@ -44,42 +44,13 @@ pip install --upgrade pip setuptools wheel -q
 
 # Installing torchvision and torchaudio alongside it forces pip's resolver 
 # to upgrade them to match the new PyTorch version vLLM installs, hiding the red ERROR block.
-pip install vllm-omni torchvision torchaudio notebook -U
+pip install vllm vllm-omni torchvision torchaudio notebook -U
 ok "vLLM-Omni installed"
 
 # ── STEP 4: Download model weights ────────────────────────────────
-MODELS="${MODELS:-t2v-A14B}"
-
-declare -A MODEL_REPO=(
-    ["t2v-A14B"]="Wan-AI/Wan2.2-T2V-A14B-Diffusers"
-    ["ti2v-5B"]="Wan-AI/Wan2.2-TI2V-5B-Diffusers"
-)
-
-if [ "${SKIP_DOWNLOAD}" = "1" ]; then
-    echo "  Skipping model download (SKIP_DOWNLOAD=1)"
-else
-    step "4/5  Downloading model weights..."
-    mkdir -p /workspace/models
-    pip install huggingface_hub hf_transfer -q
-
-    for MODEL_KEY in ${MODELS}; do
-        REPO="${MODEL_REPO[$MODEL_KEY]}"
-        DEST="/workspace/models/Wan2.2-${MODEL_KEY}"
-
-        if [ -f "${DEST}/model_index.json" ]; then
-            ok "${MODEL_KEY} already downloaded at ${DEST}"
-        else
-            echo "  Downloading ${MODEL_KEY} (Diffusers format) → ${DEST}"
-            python3 -c "
-import os
-os.environ['HF_HUB_ENABLE_HF_TRANSFER'] = '1'
-from huggingface_hub import snapshot_download
-snapshot_download(repo_id='${REPO}', local_dir='${DEST}', local_dir_use_symlinks=False)
-"
-            ok "${MODEL_KEY} downloaded to ${DEST}"
-        fi
-    done
-fi
+# Removed! You DO NOT need to manual download weights here anymore!
+# The vllm_omni engine will automatically fetch blocks from the HuggingFace Hub 
+# directly into your standard '~/.cache/huggingface/hub' exactly when you run the model.
 
 # ── Done ─────────────────────────────────────────────────────────
 echo ""
@@ -90,10 +61,10 @@ echo ""
 echo "  Run inference using the highly-optimized Python script:"
 echo ""
 echo "    # Text-to-Video (14B MoE on 1 GPU)"
-echo "    python3 generate_vllm.py --model /workspace/models/Wan2.2-t2v-A14B \\"
+echo "    python3 generate_vllm.py --model Wan-AI/Wan2.2-T2V-A14B-Diffusers \\"
 echo "      --prompt \"A cinematic shot of a cyberpunk city\""
 echo ""
 echo "    # Text-to-Video (14B MoE on 2 GPUs via Tensor Parallelism)"
-echo "    python3 generate_vllm.py --model /workspace/models/Wan2.2-t2v-A14B \\"
+echo "    python3 generate_vllm.py --model Wan-AI/Wan2.2-T2V-A14B-Diffusers \\"
 echo "      --prompt \"A cinematic shot of a cyberpunk city\" --tensor_parallel_size 2"
 echo ""
