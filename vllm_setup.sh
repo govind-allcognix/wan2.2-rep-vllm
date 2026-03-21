@@ -68,3 +68,4 @@ echo "    # Text-to-Video (14B MoE on 2 GPUs via Tensor Parallelism)"
 echo "    python3 generate_vllm.py --model Wan-AI/Wan2.2-T2V-A14B-Diffusers \\"
 echo "      --prompt \"A cinematic shot of a cyberpunk city\" --tensor_parallel_size 2"
 echo ""
+python3 cmd_run.py
