@@ -107,6 +107,14 @@ def main():
     else:
         video_array = frames
         
+    # vLLM returns videos as a strictly packed 4D Numpy array inside a length-1 list.
+    # We must unpack it into a flat list of F 3D frames so the MP4 encoder can read them!
+    if isinstance(video_array, list) and len(video_array) == 1 and isinstance(video_array[0], np.ndarray):
+        if video_array[0].ndim == 4:
+            video_array = list(video_array[0])
+        elif video_array[0].ndim == 5:
+            video_array = list(video_array[0][0])
+            
     export_to_video(video_array, "/workspace/output.mp4", fps=16)
     print(f"[+] SAVED physically to: /workspace/output.mp4")
 

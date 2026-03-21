@@ -115,6 +115,13 @@ def main():
     else:
         video_array = frames
         
+    # Unpack the 4D Tensor into a standard sequence of 3D image arrays
+    if isinstance(video_array, list) and len(video_array) == 1 and isinstance(video_array[0], np.ndarray):
+        if video_array[0].ndim == 4:
+            video_array = list(video_array[0])
+        elif video_array[0].ndim == 5:
+            video_array = list(video_array[0][0])
+            
     export_to_video(video_array, "output.mp4", fps=16)
     print(f"[+] SAVED physically to: current directory as output.mp4")
 
