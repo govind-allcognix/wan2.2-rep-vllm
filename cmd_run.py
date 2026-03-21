@@ -6,7 +6,7 @@ def main():
     height = 720
     model = "Wan-AI/Wan2.2-T2V-A14B-Diffusers"
     prompt = "A cinematic video of a cyberpunk city at night with neon lights reflecting in puddles"
-    tensor_parallel_size = 2
+    tensor_parallel_size = 1
     frames = 81
 
     print(f"Loading vLLM-Omni Diffusion Engine across {tensor_parallel_size} GPU(s)...")
