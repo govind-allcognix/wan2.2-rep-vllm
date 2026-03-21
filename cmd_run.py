@@ -14,6 +14,7 @@ def main():
     engine = Omni(
         model=model,
         tensor_parallel_size=tensor_parallel_size,
+        sp_size=tensor_parallel_size,
         enforce_eager=True,           
         trust_remote_code=True,
         gpu_memory_utilization=0.70,
