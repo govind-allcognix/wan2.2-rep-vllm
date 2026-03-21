@@ -40,7 +40,28 @@ def main():
         outputs = engine.generate(prompt)
     
     print("\n[+] Generation complete!")
-    print("Result:", outputs)
+    
+    # Extract the payload from vLLM's custom request object
+    result_obj = outputs[0].request_output[0] if getattr(outputs[0], 'request_output', None) else outputs[0]
+    
+    if hasattr(result_obj, 'images') and result_obj.images:
+        frames = result_obj.images
+        print(f"[+] Total frames generated: {len(frames)}")
+        
+        import torchvision.io
+        import numpy as np
+        
+        # Convert PIL Images to Tensor (T, H, W, C)
+        video_tensor = torch.stack([torch.from_numpy(np.array(img)) for img in frames])
+        torchvision.io.write_video(
+            "/workspace/output.mp4", 
+            video_tensor, 
+            fps=16, 
+            video_codec="libx264"
+        )
+        print("[+] SAVED physically to: /workspace/output.mp4")
+    else:
+        print("[!] No images found in the output object:", outputs)
 
 if __name__ == "__main__":
     main()
